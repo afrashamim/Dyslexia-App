@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class ReadingScreen extends StatelessWidget {
-  const ReadingScreen({super.key});
+class ReaderScreen extends StatelessWidget {
+  const ReaderScreen({super.key});
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
 
