@@ -2,6 +2,17 @@ import 'package:flutter/material.dart';
 
 class ReadingScreen extends StatelessWidget {
   const ReadingScreen({super.key});
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key});
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  final TextEditingController controller = TextEditingController();
+
+  String displayedText = '';
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +33,76 @@ class ReadingScreen extends StatelessWidget {
             fontFamily: 'OpenDyslexic3',
             fontSize: 24,
           ),
+        title: const Text('Dyslexia Reader'),
+      ),
+
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+
+        child: Column(
+          children: [
+
+            // Text input box
+            TextField(
+              controller: controller,
+              maxLines: 8,
+
+              decoration: InputDecoration(
+                hintText: 'Paste or type your text here...',
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Show button
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    displayedText = controller.text;
+                  });
+                },
+                child: const Text('Show'),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // Displayed dyslexia-friendly text
+            Expanded(
+              child: SingleChildScrollView(
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20),
+
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFFDF5),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+
+                  child: Text(
+                    displayedText.isEmpty
+                        ? 'Your text will appear here...'
+                        : displayedText,
+
+                    textAlign: TextAlign.left,
+
+                    style: const TextStyle(
+                      fontFamily: 'OpenDyslexic3',
+                      fontSize: 20,
+                      height: 1.8,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
