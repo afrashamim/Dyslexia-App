@@ -13,7 +13,6 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: const Color(0xFFF7F5EF),
         elevation: 0,
-
         title: const Text(
           'ReadEase',
           style: TextStyle(
@@ -32,7 +31,6 @@ class HomeScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               const SizedBox(height: 15),
 
               const Text(
@@ -59,18 +57,17 @@ class HomeScreen extends StatelessWidget {
 
               const SizedBox(height: 30),
 
-              // Reading
+              // ---------------- READ ----------------
               FeatureCard(
-                icon: Icons.menu_book_outlined,
+                icon: Icons.menu_book,
                 title: 'Read',
                 description:
-                    'Read text in a comfortable, dyslexia-friendly format.',
-                buttonText: 'Start Reading',
-                onPressed: () {
+                    'Read with a dyslexia-friendly interface.',
+                onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const ReadingScreen(),
+                      builder: (context) => const ReaderScreen(),
                     ),
                   );
                 },
@@ -78,43 +75,40 @@ class HomeScreen extends StatelessWidget {
 
               const SizedBox(height: 18),
 
-              // TTS
+              // ---------------- READ ALOUD ----------------
               FeatureCard(
                 icon: Icons.volume_up_outlined,
                 title: 'Read Aloud',
                 description:
                     'Listen to text being read aloud.',
-                buttonText: 'Open',
-                onPressed: () {
-                  // Person B will add TTS navigation
+                onTap: () {
+                  // Person B will add TTS navigation here
                 },
               ),
 
               const SizedBox(height: 18),
 
-              // Simplification
+              // ---------------- SIMPLIFY ----------------
               FeatureCard(
                 icon: Icons.auto_awesome_outlined,
                 title: 'Simplify',
                 description:
                     'Make difficult sentences easier to understand.',
-                buttonText: 'Open',
-                onPressed: () {
-                  // Person D will add simplification navigation
+                onTap: () {
+                  // Person D will add simplification navigation here
                 },
               ),
 
               const SizedBox(height: 18),
 
-              // Phonics
+              // ---------------- PHONICS ----------------
               FeatureCard(
                 icon: Icons.extension_outlined,
                 title: 'Phonics Game',
                 description:
                     'Practice letters, sounds and words through games.',
-                buttonText: 'Play',
-                onPressed: () {
-                  // Person C will add phonics navigation
+                onTap: () {
+                  // Person C will add phonics navigation here
                 },
               ),
             ],
