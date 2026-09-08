@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/feature_card.dart';
 import 'reader_screen.dart';
+import 'simplify_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -95,8 +96,13 @@ class HomeScreen extends StatelessWidget {
                 description:
                     'Make difficult sentences easier to understand.',
                 onTap: () {
-                  // Person D will add simplification navigation here
-                },
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => const SimplifyScreen(),
+    ),
+  );
+},
               ),
 
               const SizedBox(height: 18),
