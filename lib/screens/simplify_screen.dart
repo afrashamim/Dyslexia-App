@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import '../theme/app_theme.dart';
+
 class SimplifyScreen extends StatefulWidget {
   const SimplifyScreen({super.key});
 
@@ -67,20 +69,8 @@ class _SimplifyScreenState extends State<SimplifyScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F5EF),
-
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF7F5EF),
-        elevation: 0,
-        title: const Text(
-          'Simplify',
-          style: TextStyle(
-            fontFamily: 'OpenDyslexic3',
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF3E352D),
-          ),
-        ),
+        title: const Text('Simplify'),
       ),
 
       body: Padding(
@@ -88,64 +78,39 @@ class _SimplifyScreenState extends State<SimplifyScreen> {
 
         child: Column(
           children: [
+            // Input text
             TextField(
               controller: controller,
               maxLines: 7,
 
               style: const TextStyle(
-                fontFamily: 'OpenDyslexic3',
+                fontFamily: kAppFont,
                 fontSize: 17,
-                color: Color(0xFF302B27),
+                color: AppColors.ink,
               ),
 
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Enter a difficult sentence here...',
-
-                hintStyle: const TextStyle(
-                  fontFamily: 'OpenDyslexic3',
-                  color: Color(0xFF80776E),
-                ),
-
-                filled: true,
-                fillColor: Colors.white,
-
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
               ),
             ),
 
             const SizedBox(height: 14),
 
+            // Simplify button
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: isLoading ? null : simplifyText,
 
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF5A4A3D),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 14,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-
                 child: Text(
                   isLoading ? 'Simplifying...' : 'Simplify Text',
-                  style: const TextStyle(
-                    fontFamily: 'OpenDyslexic3',
-                    fontSize: 17,
-                  ),
                 ),
               ),
             ),
 
             const SizedBox(height: 20),
 
+            // Simplified text
             Expanded(
               child: SingleChildScrollView(
                 child: Container(
@@ -154,8 +119,12 @@ class _SimplifyScreenState extends State<SimplifyScreen> {
                   padding: const EdgeInsets.all(20),
 
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFFFDF5),
-                    borderRadius: BorderRadius.circular(12),
+                    color: AppColors.displayBox,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: AppColors.paperDeep,
+                      width: 1.5,
+                    ),
                   ),
 
                   child: Text(
@@ -164,11 +133,11 @@ class _SimplifyScreenState extends State<SimplifyScreen> {
                         : simplifiedText,
 
                     style: const TextStyle(
-                      fontFamily: 'OpenDyslexic3',
+                      fontFamily: kAppFont,
                       fontSize: 20,
                       height: 1.8,
                       letterSpacing: 0.5,
-                      color: Color(0xFF302B27),
+                      color: AppColors.ink,
                     ),
                   ),
                 ),
