@@ -1,28 +1,21 @@
 import 'package:flutter/material.dart';
-import 'screens/reader_screen.dart';
+import 'screens/home_screen.dart';
+import 'theme/app_theme.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const ReadEaseApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class ReadEaseApp extends StatelessWidget {
+  const ReadEaseApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Dyslexia Reader',
-
-      theme: ThemeData(
-        fontFamily: 'OpenDyslexic3',
-        scaffoldBackgroundColor: const Color(0xFFF8F5E6),
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF6B705C),
-        ),
-      ),
-
-      home: const MyHomePage(),
+      title: 'ReadEase',
+      theme: appTheme,
+      home: const HomeScreen(),
     );
   }
 }
