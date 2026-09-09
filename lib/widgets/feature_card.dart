@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_theme.dart';
 
 class FeatureCard extends StatelessWidget {
   final IconData icon;
@@ -16,41 +17,40 @@ class FeatureCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(icon),
-            const SizedBox(height: 10),
-            Text(
-              title,
-              style: const TextStyle(
-                fontFamily: 'OpenDyslexic3',
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+          decoration: BoxDecoration(
+            color: AppColors.paperDeep,
+            borderRadius: BorderRadius.circular(10),
+            border: const Border(
+              left: BorderSide(color: AppColors.moss, width: 5),
             ),
-            const SizedBox(height: 8),
-            Text(
-              description,
-              style: const TextStyle(
-                fontFamily: 'OpenDyslexic3',
-                fontSize: 15,
-              ),
-            ),
-            const SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: onTap,
-              child: const Text(
-                'Open',
-                style: TextStyle(
-                  fontFamily: 'OpenDyslexic3',
+          ),
+          child: Row(
+            children: [
+              Icon(icon, color: AppColors.ink, size: 26),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, style: Theme.of(context).textTheme.titleLarge),
+                    const SizedBox(height: 4),
+                    Text(
+                      description,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ],
                 ),
               ),
-            ),
-          ],
+              const Icon(Icons.chevron_right, color: AppColors.inkFaded),
+            ],
+          ),
         ),
       ),
     );
