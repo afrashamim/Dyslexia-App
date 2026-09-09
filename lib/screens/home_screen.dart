@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_theme.dart';
 import '../widgets/feature_card.dart';
 import 'reader_screen.dart';
 import 'simplify_screen.dart';
@@ -9,20 +10,8 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F5EF),
-
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF7F5EF),
-        elevation: 0,
-        title: const Text(
-          'ReadEase',
-          style: TextStyle(
-            fontFamily: 'OpenDyslexic3',
-            fontSize: 25,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF3E352D),
-          ),
-        ),
+        title: const Text('ReadEase'), // styling now comes from appBarTheme
       ),
 
       body: SafeArea(
@@ -34,26 +23,16 @@ class HomeScreen extends StatelessWidget {
             children: [
               const SizedBox(height: 15),
 
-              const Text(
+              Text(
                 'Welcome 👋',
-                style: TextStyle(
-                  fontFamily: 'OpenDyslexic3',
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF3E352D),
-                ),
+                style: Theme.of(context).textTheme.headlineMedium,
               ),
 
               const SizedBox(height: 10),
 
-              const Text(
+              Text(
                 'What would you like to do today?',
-                style: TextStyle(
-                  fontFamily: 'OpenDyslexic3',
-                  fontSize: 18,
-                  height: 1.5,
-                  color: Color(0xFF62584F),
-                ),
+                style: Theme.of(context).textTheme.bodyLarge,
               ),
 
               const SizedBox(height: 30),
@@ -62,8 +41,7 @@ class HomeScreen extends StatelessWidget {
               FeatureCard(
                 icon: Icons.menu_book,
                 title: 'Read',
-                description:
-                    'Read with a dyslexia-friendly interface.',
+                description: 'Read with a dyslexia-friendly interface.',
                 onTap: () {
                   Navigator.push(
                     context,
@@ -80,8 +58,7 @@ class HomeScreen extends StatelessWidget {
               FeatureCard(
                 icon: Icons.volume_up_outlined,
                 title: 'Read Aloud',
-                description:
-                    'Listen to text being read aloud.',
+                description: 'Listen to text being read aloud.',
                 onTap: () {
                   // Person B will add TTS navigation here
                 },
@@ -93,8 +70,7 @@ class HomeScreen extends StatelessWidget {
               FeatureCard(
                 icon: Icons.auto_awesome_outlined,
                 title: 'Simplify',
-                description:
-                    'Make difficult sentences easier to understand.',
+                description: 'Make difficult sentences easier to understand.',
                 onTap: () {
   Navigator.push(
     context,
@@ -111,8 +87,7 @@ class HomeScreen extends StatelessWidget {
               FeatureCard(
                 icon: Icons.extension_outlined,
                 title: 'Phonics Game',
-                description:
-                    'Practice letters, sounds and words through games.',
+                description: 'Practice letters, sounds and words through games.',
                 onTap: () {
                   // Person C will add phonics navigation here
                 },
