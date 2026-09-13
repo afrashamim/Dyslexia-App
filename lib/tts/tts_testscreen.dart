@@ -9,6 +9,8 @@ class TtsTestScreen extends StatefulWidget {
 }
 
 class _TtsTestScreenState extends State<TtsTestScreen> {
+  int _highlightStart = -1;
+  int _highlightEnd = -1;
   final TtsService _ttsService = TtsService();
   final TextEditingController _textController = TextEditingController();
 
@@ -27,6 +29,16 @@ class _TtsTestScreenState extends State<TtsTestScreen> {
 
   Future<void> _initializeTts() async {
     await _ttsService.initialize();
+    _ttsService.setProgressHandler(
+  (text, startOffset, endOffset, word) {
+    if (!mounted) return;
+
+      setState(() {
+        _highlightStart = startOffset;
+        _highlightEnd = endOffset;
+          });
+        },
+      );
 
     _ttsService.setStartHandler(() {
       if (!mounted) return;
@@ -38,13 +50,15 @@ class _TtsTestScreenState extends State<TtsTestScreen> {
     });
 
     _ttsService.setCompletionHandler(() {
-      if (!mounted) return;
+        if (!mounted) return;
 
-      setState(() {
-        _isPlaying = false;
-        _isPaused = false;
+        setState(() {
+          _isPlaying = false;
+          _isPaused = false;
+          _highlightStart = -1;
+          _highlightEnd = -1;
+        });
       });
-    });
 
     _ttsService.setPauseHandler(() {
       if (!mounted) return;
@@ -65,13 +79,15 @@ class _TtsTestScreenState extends State<TtsTestScreen> {
     });
 
     _ttsService.setCancelHandler(() {
-      if (!mounted) return;
+        if (!mounted) return;
 
-      setState(() {
-        _isPlaying = false;
-        _isPaused = false;
+        setState(() {
+          _isPlaying = false;
+          _isPaused = false;
+          _highlightStart = -1;
+          _highlightEnd = -1;
+        });
       });
-    });
 
     _ttsService.setErrorHandler((message) {
       if (!mounted) return;
@@ -114,9 +130,11 @@ class _TtsTestScreenState extends State<TtsTestScreen> {
     if (!mounted) return;
 
     setState(() {
-      _isPlaying = false;
-      _isPaused = false;
-    });
+    _isPlaying = false;
+    _isPaused = false;
+    _highlightStart = -1;
+    _highlightEnd = -1;
+  });
   }
 
   Future<void> _setSpeechRate(double value) async {
@@ -142,6 +160,50 @@ class _TtsTestScreenState extends State<TtsTestScreen> {
 
     await _ttsService.setVolume(value);
   }
+  Widget _buildHighlightedText() {
+  final text = _textController.text;
+
+  if (text.isEmpty) {
+    return const SizedBox();
+  }
+
+  if (_highlightStart < 0 || _highlightEnd <= _highlightStart) {
+    return Text(
+      text,
+      style: const TextStyle(
+        fontSize: 20,
+        color: Colors.black,
+      ),
+    );
+  }
+
+  final before = text.substring(0, _highlightStart);
+  final highlighted = text.substring(
+    _highlightStart,
+    _highlightEnd,
+  );
+  final after = text.substring(_highlightEnd);
+
+  return RichText(
+    text: TextSpan(
+      style: const TextStyle(
+        fontSize: 20,
+        color: Colors.black,
+      ),
+      children: [
+        TextSpan(text: before),
+        TextSpan(
+          text: highlighted,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            backgroundColor: Colors.yellow,
+          ),
+        ),
+        TextSpan(text: after),
+      ],
+    ),
+  );
+}
 
   @override
   void dispose() {
@@ -154,7 +216,7 @@ class _TtsTestScreenState extends State<TtsTestScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('TTS Test'),
+        title: const Text('Read Aloud'),
       ),
 
       body: SingleChildScrollView(
@@ -174,18 +236,37 @@ class _TtsTestScreenState extends State<TtsTestScreen> {
             const SizedBox(height: 20),
 
             TextField(
-              controller: _textController,
-              maxLines: 8,
+                controller: _textController,
+                maxLines: 8,
 
-              decoration: InputDecoration(
-                hintText: 'Enter text to speak...',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                onChanged: (_) {
+                  setState(() {
+                    _highlightStart = -1;
+                    _highlightEnd = -1;
+                  });
+                },
+
+                decoration: InputDecoration(
+                  hintText: 'Enter text to speak...',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
-            ),
 
-            const SizedBox(height: 20),
+              const SizedBox(height: 20),
+
+              // Currently spoken word
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: _buildHighlightedText(),
+              ),
+
+              const SizedBox(height: 20),
 
             // Play / Pause / Stop
             Row(

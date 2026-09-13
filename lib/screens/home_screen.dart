@@ -3,6 +3,7 @@ import '../theme/app_theme.dart';
 import '../widgets/feature_card.dart';
 import 'reader_screen.dart';
 import 'simplify_screen.dart';
+import '../tts/tts_testscreen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -60,8 +61,13 @@ class HomeScreen extends StatelessWidget {
                 title: 'Read Aloud',
                 description: 'Listen to text being read aloud.',
                 onTap: () {
-                  // Person B will add TTS navigation here
-                },
+                Navigator.push(
+                 context,
+                  MaterialPageRoute(
+                  builder: (context) => const TtsTestScreen(),
+                  ),
+              );
+              },
               ),
 
               const SizedBox(height: 18),
