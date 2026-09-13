@@ -27,7 +27,7 @@ final ThemeData appTheme = ThemeData(
       fontFamily: kAppFont,
       fontSize: 22,
       fontWeight: FontWeight.w700,
-      color: AppColors.ink,
+      color: Color.fromARGB(255, 42, 51, 44),
     ),
   ),
 
