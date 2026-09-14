@@ -15,10 +15,14 @@ class _ListenDragGameState extends State<ListenDragGame> {
   int questionIndex = 0;
   int score = 0;
 
-  // Number of questions in each game
+  // Number of questions in each try
   static const int questionsPerGame = 4;
 
+  // Questions for the current try
   late List<Map<String, dynamic>> questions;
+
+  // Questions that have not been used yet
+  List<Map<String, dynamic>> remainingQuestions = [];
 
   // =====================================================
   // PHONICS QUESTION BANK
@@ -357,26 +361,56 @@ class _ListenDragGameState extends State<ListenDragGame> {
   }
 
   // =====================================================
-  // CREATE RANDOM GAME
+  // CREATE NEW GAME
   // =====================================================
 
   void _createNewGame() {
-    questions = List<Map<String, dynamic>>.from(allQuestions);
+    // Start with all available questions
+    remainingQuestions =
+        List<Map<String, dynamic>>.from(allQuestions);
 
-    // Randomize questions
-    questions.shuffle(Random());
+    // Shuffle the complete question bank
+    remainingQuestions.shuffle(Random());
 
-    // Select only the required number
-    questions = questions.take(questionsPerGame).toList();
+    // Start the first try
+    _startNextTry();
+  }
 
-    // Randomize options
+  // =====================================================
+  // START NEXT TRY
+  // =====================================================
+
+  void _startNextTry() {
+    if (remainingQuestions.isEmpty) {
+      return;
+    }
+
+    // Take 4 questions for this try.
+    // If fewer than 4 remain, take whatever is left.
+    final numberToTake = min(
+      questionsPerGame,
+      remainingQuestions.length,
+    );
+
+    questions = remainingQuestions.take(numberToTake).toList();
+
+    // Remove these questions from the remaining list.
+    // This prevents them from appearing in future tries.
+    remainingQuestions.removeRange(0, numberToTake);
+
+    // Shuffle the answer options for each question
     for (final question in questions) {
-      final options = List<String>.from(question['options']);
+      final options = List<String>.from(
+        question['options'] as List,
+      );
 
       options.shuffle(Random());
 
       question['options'] = options;
     }
+
+    // Start from the first question of this try
+    questionIndex = 0;
   }
 
   // =====================================================
@@ -396,7 +430,8 @@ class _ListenDragGameState extends State<ListenDragGame> {
   // =====================================================
 
   void checkAnswer(String letter) {
-    final correctAnswer = questions[questionIndex]['answer'];
+    final correctAnswer =
+        questions[questionIndex]['answer'] as String;
 
     if (letter == correctAnswer) {
       setState(() {
@@ -410,17 +445,27 @@ class _ListenDragGameState extends State<ListenDragGame> {
         ),
       );
 
-      Future.delayed(const Duration(milliseconds: 900), () {
-        if (!mounted) return;
+      Future.delayed(
+        const Duration(milliseconds: 900),
+        () {
+          if (!mounted) return;
 
-        if (questionIndex < questions.length - 1) {
-          setState(() {
-            questionIndex++;
-          });
-        } else {
-          showFinalScore();
-        }
-      });
+          // There are more questions in the current try
+          if (questionIndex < questions.length - 1) {
+            setState(() {
+              questionIndex++;
+            });
+          } else {
+            // Current try is complete
+            if (remainingQuestions.isNotEmpty) {
+              _showNextTryDialog();
+            } else {
+              // All questions have been completed
+              showFinalScore();
+            }
+          }
+        },
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -432,10 +477,46 @@ class _ListenDragGameState extends State<ListenDragGame> {
   }
 
   // =====================================================
+  // NEXT TRY DIALOG
+  // =====================================================
+
+  void _showNextTryDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Try Complete! 🎉'),
+          content: Text(
+            'Great job!\n\n'
+            'You completed ${questions.length} letters.\n'
+            '${remainingQuestions.length} letters are left.\n\n'
+            'Ready for the next try?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+
+                setState(() {
+                  _startNextTry();
+                });
+              },
+              child: const Text('Next Try'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // =====================================================
   // FINAL SCORE
   // =====================================================
 
   void showFinalScore() {
+    final totalQuestions = allQuestions.length;
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -443,7 +524,8 @@ class _ListenDragGameState extends State<ListenDragGame> {
         return AlertDialog(
           title: const Text('Game Complete! 🎉'),
           content: Text(
-            'Your score is $score / ${questions.length * 10}',
+            'You completed all $totalQuestions questions!\n\n'
+            'Your score is $score / ${totalQuestions * 10}',
           ),
           actions: [
             // PLAY AGAIN
@@ -452,8 +534,8 @@ class _ListenDragGameState extends State<ListenDragGame> {
                 Navigator.pop(context);
 
                 setState(() {
-                  questionIndex = 0;
                   score = 0;
+                  questionIndex = 0;
 
                   _createNewGame();
                 });
@@ -550,8 +632,6 @@ class _ListenDragGameState extends State<ListenDragGame> {
                 onPressed: _playSound,
               ),
             ),
-
-            // No phonics text is displayed here.
 
             const SizedBox(height: 50),
 
