@@ -17,7 +17,7 @@ class TtsService {
     'name': 'en-us-x-iom-local',
     'locale': 'en-US',
      });
-    await _tts.setSpeechRate(0.4);
+    await _tts.setSpeechRate(0.3);
     await _tts.setVolume(1.0);
     await _tts.setPitch(1.0);
 
