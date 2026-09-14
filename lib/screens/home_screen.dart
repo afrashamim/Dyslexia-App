@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../widgets/feature_card.dart';
 import 'reader_screen.dart';
+import 'simplify_screen.dart';
+import '../tts/tts_testscreen.dart';
 import '../phonics/phonics_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -60,8 +62,13 @@ class HomeScreen extends StatelessWidget {
                 title: 'Read Aloud',
                 description: 'Listen to text being read aloud.',
                 onTap: () {
-                  // Person B will add TTS navigation here
-                },
+                Navigator.push(
+                 context,
+                  MaterialPageRoute(
+                  builder: (context) => const TtsTestScreen(),
+                  ),
+              );
+              },
               ),
 
               const SizedBox(height: 18),
@@ -72,8 +79,13 @@ class HomeScreen extends StatelessWidget {
                 title: 'Simplify',
                 description: 'Make difficult sentences easier to understand.',
                 onTap: () {
-                  // Person D will add simplification navigation here
-                },
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SimplifyScreen(),
+                  ),
+                );
+              },
               ),
 
               const SizedBox(height: 18),
