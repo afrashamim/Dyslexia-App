@@ -4,6 +4,7 @@ import '../widgets/feature_card.dart';
 import 'reader_screen.dart';
 import 'simplify_screen.dart';
 import '../tts/tts_testscreen.dart';
+import '../phonics/phonics_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -78,13 +79,13 @@ class HomeScreen extends StatelessWidget {
                 title: 'Simplify',
                 description: 'Make difficult sentences easier to understand.',
                 onTap: () {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => const SimplifyScreen(),
-    ),
-  );
-},
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SimplifyScreen(),
+                  ),
+                );
+              },
               ),
 
               const SizedBox(height: 18),
@@ -95,8 +96,13 @@ class HomeScreen extends StatelessWidget {
                 title: 'Phonics Game',
                 description: 'Practice letters, sounds and words through games.',
                 onTap: () {
-                  // Person C will add phonics navigation here
-                },
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const PhonicsScreen(),
+                        ),
+                      );
+                    },
               ),
             ],
           ),
