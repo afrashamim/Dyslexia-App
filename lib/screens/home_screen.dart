@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../widgets/feature_card.dart';
 import 'reader_screen.dart';
+import '../phonics/phonics_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -83,8 +84,13 @@ class HomeScreen extends StatelessWidget {
                 title: 'Phonics Game',
                 description: 'Practice letters, sounds and words through games.',
                 onTap: () {
-                  // Person C will add phonics navigation here
-                },
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const PhonicsScreen(),
+                        ),
+                      );
+                    },
               ),
             ],
           ),

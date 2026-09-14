@@ -39,6 +39,7 @@ class _BuildWordGameState extends State<BuildWordGame> {
     final Map<String, dynamic> decoded = jsonDecode(raw);
 
     final parsed = <String, List<Map<String, String>>>{};
+
     decoded.forEach((category, entries) {
       parsed[category] = (entries as List)
           .map((e) => {
@@ -50,7 +51,7 @@ class _BuildWordGameState extends State<BuildWordGame> {
 
     setState(() {
       wordsByCategory = parsed;
-      selectedCategories = parsed.keys.toSet(); // default: all categories
+      selectedCategories = parsed.keys.toSet();
       isLoading = false;
     });
 
@@ -59,20 +60,26 @@ class _BuildWordGameState extends State<BuildWordGame> {
 
   List<Map<String, String>> get _activePool {
     final pool = <Map<String, String>>[];
+
     for (final category in selectedCategories) {
       pool.addAll(wordsByCategory[category] ?? []);
     }
+
     return pool;
   }
 
   void startNewRound() {
     final pool = _activePool;
+
     if (pool.isEmpty) return;
 
     final shuffled = List<Map<String, String>>.from(pool)..shuffle();
+
     words = shuffled.take(min(roundLength, pool.length)).toList();
+
     wordIndex = 0;
     score = 0;
+
     prepareLetters();
   }
 
@@ -149,6 +156,7 @@ class _BuildWordGameState extends State<BuildWordGame> {
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
+
                 setState(() {
                   startNewRound();
                 });
@@ -218,6 +226,7 @@ class _BuildWordGameState extends State<BuildWordGame> {
                           setState(() {
                             selectedCategories = tempSelection;
                           });
+
                           Navigator.pop(context);
                           startNewRound();
                         },
@@ -236,11 +245,12 @@ class _BuildWordGameState extends State<BuildWordGame> {
   double _tileSizeFor(double availableWidth, int letterCount) {
     const maxTileSize = 65.0;
     const minTileSize = 34.0;
-    const margin = 12.0; // 6px margin on each side of a tile
+    const margin = 12.0;
 
     if (letterCount == 0) return maxTileSize;
 
     final sizeThatFits = (availableWidth / letterCount) - margin;
+
     return sizeThatFits.clamp(minTileSize, maxTileSize);
   }
 
@@ -248,7 +258,9 @@ class _BuildWordGameState extends State<BuildWordGame> {
   Widget build(BuildContext context) {
     if (isLoading) {
       return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
       );
     }
 
@@ -309,7 +321,9 @@ class _BuildWordGameState extends State<BuildWordGame> {
 
             const Text(
               'Your word',
-              style: TextStyle(fontSize: 18),
+              style: TextStyle(
+                fontSize: 18,
+              ),
             ),
 
             const SizedBox(height: 15),
@@ -362,7 +376,9 @@ class _BuildWordGameState extends State<BuildWordGame> {
 
             const Text(
               'Choose the letters',
-              style: TextStyle(fontSize: 18),
+              style: TextStyle(
+                fontSize: 18,
+              ),
             ),
 
             const SizedBox(height: 20),
@@ -379,14 +395,21 @@ class _BuildWordGameState extends State<BuildWordGame> {
 
             const SizedBox(height: 40),
 
+            // FIXED CHECK ANSWER BUTTON
             SizedBox(
               width: double.infinity,
-              height: 55,
+              height: 60,
               child: ElevatedButton(
-                onPressed: selectedLetters.isEmpty ? null : checkWord,
+                onPressed:
+                    selectedLetters.isEmpty ? null : checkWord,
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                ),
                 child: const Text(
                   'Check Answer',
-                  style: TextStyle(fontSize: 20),
+                  style: TextStyle(
+                    fontSize: 20,
+                  ),
                 ),
               ),
             ),
