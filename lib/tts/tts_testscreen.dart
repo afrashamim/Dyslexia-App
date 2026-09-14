@@ -11,6 +11,7 @@ class TtsTestScreen extends StatefulWidget {
 class _TtsTestScreenState extends State<TtsTestScreen> {
   int _highlightStart = -1;
   int _highlightEnd = -1;
+  int _resumeBaseOffset = 0; // tracks how far we'd gotten before the last pause
   final TtsService _ttsService = TtsService();
   final TextEditingController _textController = TextEditingController();
 
@@ -29,16 +30,17 @@ class _TtsTestScreenState extends State<TtsTestScreen> {
 
   Future<void> _initializeTts() async {
     await _ttsService.initialize();
-    _ttsService.setProgressHandler(
-  (text, startOffset, endOffset, word) {
-    if (!mounted) return;
 
-      setState(() {
-        _highlightStart = startOffset;
-        _highlightEnd = endOffset;
-          });
-        },
-      );
+    _ttsService.setProgressHandler(
+      (text, startOffset, endOffset, word) {
+        if (!mounted) return;
+
+        setState(() {
+          _highlightStart = _resumeBaseOffset + startOffset;
+          _highlightEnd = _resumeBaseOffset + endOffset;
+        });
+      },
+    );
 
     _ttsService.setStartHandler(() {
       if (!mounted) return;
@@ -50,15 +52,16 @@ class _TtsTestScreenState extends State<TtsTestScreen> {
     });
 
     _ttsService.setCompletionHandler(() {
-        if (!mounted) return;
+      if (!mounted) return;
 
-        setState(() {
-          _isPlaying = false;
-          _isPaused = false;
-          _highlightStart = -1;
-          _highlightEnd = -1;
-        });
+      setState(() {
+        _isPlaying = false;
+        _isPaused = false;
+        _highlightStart = -1;
+        _highlightEnd = -1;
+        _resumeBaseOffset = 0;
       });
+    });
 
     _ttsService.setPauseHandler(() {
       if (!mounted) return;
@@ -79,15 +82,16 @@ class _TtsTestScreenState extends State<TtsTestScreen> {
     });
 
     _ttsService.setCancelHandler(() {
-        if (!mounted) return;
+      if (!mounted) return;
 
-        setState(() {
-          _isPlaying = false;
-          _isPaused = false;
-          _highlightStart = -1;
-          _highlightEnd = -1;
-        });
+      setState(() {
+        _isPlaying = false;
+        _isPaused = false;
+        _highlightStart = -1;
+        _highlightEnd = -1;
+        _resumeBaseOffset = 0;
       });
+    });
 
     _ttsService.setErrorHandler((message) {
       if (!mounted) return;
@@ -105,6 +109,15 @@ class _TtsTestScreenState extends State<TtsTestScreen> {
     });
   }
 
+  // Decides whether Play should start fresh or resume from a pause.
+  Future<void> _playOrResume() async {
+    if (_isPaused) {
+      await _resume();
+    } else {
+      await _speak();
+    }
+  }
+
   Future<void> _speak() async {
     final text = _textController.text.trim();
 
@@ -117,10 +130,28 @@ class _TtsTestScreenState extends State<TtsTestScreen> {
       return;
     }
 
+    _resumeBaseOffset = 0; // fresh start, not a resume
     await _ttsService.speak(text);
   }
 
+  Future<void> _resume() async {
+    final fullText = _textController.text;
+    final start = _resumeBaseOffset.clamp(0, fullText.length);
+    final remaining = fullText.substring(start);
+
+    if (remaining.trim().isEmpty) {
+      return;
+    }
+
+    // Deliberately do NOT reset _resumeBaseOffset here —
+    // it's what lets the highlight continue from the right place.
+    await _ttsService.speak(remaining);
+  }
+
   Future<void> _pause() async {
+    if (_highlightStart >= 0) {
+      _resumeBaseOffset = _highlightStart;
+    }
     await _ttsService.pause();
   }
 
@@ -130,11 +161,12 @@ class _TtsTestScreenState extends State<TtsTestScreen> {
     if (!mounted) return;
 
     setState(() {
-    _isPlaying = false;
-    _isPaused = false;
-    _highlightStart = -1;
-    _highlightEnd = -1;
-  });
+      _isPlaying = false;
+      _isPaused = false;
+      _highlightStart = -1;
+      _highlightEnd = -1;
+      _resumeBaseOffset = 0;
+    });
   }
 
   Future<void> _setSpeechRate(double value) async {
@@ -160,50 +192,52 @@ class _TtsTestScreenState extends State<TtsTestScreen> {
 
     await _ttsService.setVolume(value);
   }
+
   Widget _buildHighlightedText() {
-  final text = _textController.text;
+    final text = _textController.text;
 
-  if (text.isEmpty) {
-    return const SizedBox();
-  }
+    if (text.isEmpty) {
+      return const SizedBox();
+    }
 
-  if (_highlightStart < 0 || _highlightEnd <= _highlightStart) {
-    return Text(
-      text,
-      style: const TextStyle(
-        fontSize: 20,
-        color: Colors.black,
+    if (_highlightStart < 0 || _highlightEnd <= _highlightStart) {
+      return Text(
+        text,
+        style: const TextStyle(
+          fontSize: 20,
+          color: Colors.black,
+        ),
+      );
+    }
+
+    // Guard against offsets that overshoot the text length
+    final safeStart = _highlightStart.clamp(0, text.length);
+    final safeEnd = _highlightEnd.clamp(0, text.length);
+
+    final before = text.substring(0, safeStart);
+    final highlighted = text.substring(safeStart, safeEnd);
+    final after = text.substring(safeEnd);
+
+    return RichText(
+      text: TextSpan(
+        style: const TextStyle(
+          fontSize: 20,
+          color: Colors.black,
+        ),
+        children: [
+          TextSpan(text: before),
+          TextSpan(
+            text: highlighted,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              backgroundColor: Colors.yellow,
+            ),
+          ),
+          TextSpan(text: after),
+        ],
       ),
     );
   }
-
-  final before = text.substring(0, _highlightStart);
-  final highlighted = text.substring(
-    _highlightStart,
-    _highlightEnd,
-  );
-  final after = text.substring(_highlightEnd);
-
-  return RichText(
-    text: TextSpan(
-      style: const TextStyle(
-        fontSize: 20,
-        color: Colors.black,
-      ),
-      children: [
-        TextSpan(text: before),
-        TextSpan(
-          text: highlighted,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            backgroundColor: Colors.yellow,
-          ),
-        ),
-        TextSpan(text: after),
-      ],
-    ),
-  );
-}
 
   @override
   void dispose() {
@@ -218,10 +252,8 @@ class _TtsTestScreenState extends State<TtsTestScreen> {
       appBar: AppBar(
         title: const Text('Read Aloud'),
       ),
-
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
-
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -236,37 +268,36 @@ class _TtsTestScreenState extends State<TtsTestScreen> {
             const SizedBox(height: 20),
 
             TextField(
-                controller: _textController,
-                maxLines: 8,
-
-                onChanged: (_) {
-                  setState(() {
-                    _highlightStart = -1;
-                    _highlightEnd = -1;
-                  });
-                },
-
-                decoration: InputDecoration(
-                  hintText: 'Enter text to speak...',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // Currently spoken word
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
+              controller: _textController,
+              maxLines: 8,
+              onChanged: (_) {
+                setState(() {
+                  _highlightStart = -1;
+                  _highlightEnd = -1;
+                  _resumeBaseOffset = 0;
+                });
+              },
+              decoration: InputDecoration(
+                hintText: 'Enter text to speak...',
+                border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: _buildHighlightedText(),
               ),
+            ),
 
-              const SizedBox(height: 20),
+            const SizedBox(height: 20),
+
+            // Currently spoken word
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: _buildHighlightedText(),
+            ),
+
+            const SizedBox(height: 20),
 
             // Play / Pause / Stop
             Row(
@@ -275,7 +306,7 @@ class _TtsTestScreenState extends State<TtsTestScreen> {
                 IconButton(
                   iconSize: 45,
                   tooltip: 'Play',
-                  onPressed: _isPlaying ? null : _speak,
+                  onPressed: _isPlaying ? null : _playOrResume,
                   icon: const Icon(Icons.play_arrow),
                 ),
 
@@ -322,12 +353,10 @@ class _TtsTestScreenState extends State<TtsTestScreen> {
               children: [
                 const Icon(Icons.speed),
                 const SizedBox(width: 10),
-
                 const SizedBox(
                   width: 80,
                   child: Text('Speed'),
                 ),
-
                 Expanded(
                   child: Slider(
                     min: 0.1,
@@ -337,7 +366,6 @@ class _TtsTestScreenState extends State<TtsTestScreen> {
                     onChanged: _setSpeechRate,
                   ),
                 ),
-
                 SizedBox(
                   width: 40,
                   child: Text(
@@ -352,12 +380,10 @@ class _TtsTestScreenState extends State<TtsTestScreen> {
               children: [
                 const Icon(Icons.graphic_eq),
                 const SizedBox(width: 10),
-
                 const SizedBox(
                   width: 80,
                   child: Text('Pitch'),
                 ),
-
                 Expanded(
                   child: Slider(
                     min: 0.5,
@@ -367,7 +393,6 @@ class _TtsTestScreenState extends State<TtsTestScreen> {
                     onChanged: _setPitch,
                   ),
                 ),
-
                 SizedBox(
                   width: 40,
                   child: Text(
@@ -382,12 +407,10 @@ class _TtsTestScreenState extends State<TtsTestScreen> {
               children: [
                 const Icon(Icons.volume_up),
                 const SizedBox(width: 10),
-
                 const SizedBox(
                   width: 80,
                   child: Text('Volume'),
                 ),
-
                 Expanded(
                   child: Slider(
                     min: 0.0,
@@ -397,7 +420,6 @@ class _TtsTestScreenState extends State<TtsTestScreen> {
                     onChanged: _setVolume,
                   ),
                 ),
-
                 SizedBox(
                   width: 40,
                   child: Text(

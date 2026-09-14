@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../theme/app_theme.dart';
 import '../widgets/feature_card.dart';
 import 'reader_screen.dart';
 import 'simplify_screen.dart';
