@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import '../tts/tts_service.dart';
 
 class HearWordGame extends StatefulWidget {
   const HearWordGame({super.key});
@@ -11,6 +12,9 @@ class HearWordGame extends StatefulWidget {
 
 class _HearWordGameState extends State<HearWordGame> {
   final Random random = Random();
+  final TtsService _ttsService = TtsService();
+
+  static const int questionsPerGame = 4;
 
   final Map<String, List<Map<String, dynamic>>> categories = {
     'Fruits': [
@@ -68,7 +72,6 @@ class _HearWordGameState extends State<HearWordGame> {
       {'word': 'dolphin', 'options': ['dolfin', 'dolphin', 'dolfhin']},
       {'word': 'parrot', 'options': ['parot', 'parrot', 'parrut']},
       {'word': 'penguin', 'options': ['pengwin', 'penguin', 'penguen']},
-      {'word': 'zebra', 'options': ['zeebra', 'zebra', 'zibra']},
     ],
 
     'Flowers': [
@@ -112,7 +115,6 @@ class _HearWordGameState extends State<HearWordGame> {
         'options': ['chrisanthemum', 'chrysanthemum', 'crysanthemum']
       },
       {'word': 'gerbera', 'options': ['gerbera', 'gerbira', 'gerbora']},
-      {'word': 'dahlia', 'options': ['dalia', 'dahlia', 'dahliah']},
     ],
 
     'Food': [
@@ -141,14 +143,10 @@ class _HearWordGameState extends State<HearWordGame> {
       {'word': 'popcorn', 'options': ['popkorn', 'popcorn', 'popkorn']},
       {'word': 'icecream', 'options': ['icecreem', 'icecream', 'icecrem']},
       {'word': 'omelette', 'options': ['omelet', 'omelette', 'omlette']},
-      {'word': 'sandwich', 'options': ['sandwitch', 'sandwich', 'sandwiche']},
     ],
   };
 
-  String selectedCategory = 'Fruits';
-
-  List<Map<String, dynamic>> remainingWords = [];
-  List<Map<String, dynamic>> currentRound = [];
+  List<Map<String, dynamic>> questions = [];
 
   late Map<String, dynamic> currentQuestion;
 
@@ -159,70 +157,68 @@ class _HearWordGameState extends State<HearWordGame> {
 
   bool answered = false;
   bool correct = false;
+  bool gameFinished = false;
 
   @override
   void initState() {
     super.initState();
-    prepareCategory();
+
+    _ttsService.initialize();
+    startGame();
   }
 
-  // Remove duplicate words from a category.
-  List<Map<String, dynamic>> getUniqueWords(
-    List<Map<String, dynamic>> words,
-  ) {
-    final Set<String> seen = {};
+  List<Map<String, dynamic>> getAllWords() {
+    final List<Map<String, dynamic>> allWords = [];
 
-    return words.where((item) {
-      final word = item['word'] as String;
-
-      if (seen.contains(word)) {
-        return false;
+    for (final categoryWords in categories.values) {
+      for (final word in categoryWords) {
+        allWords.add(Map<String, dynamic>.from(word));
       }
-
-      seen.add(word);
-      return true;
-    }).map((item) {
-      return Map<String, dynamic>.from(item);
-    }).toList();
-  }
-
-  void prepareCategory() {
-    remainingWords = getUniqueWords(categories[selectedCategory]!);
-    remainingWords.shuffle(random);
-    startNextRound();
-  }
-
-  void startNextRound() {
-    if (remainingWords.isEmpty) {
-      setState(() {
-        currentRound = [];
-      });
-      return;
     }
 
-    final numberOfWords =
-        remainingWords.length >= 4 ? 4 : remainingWords.length;
+    return allWords;
+  }
 
-    currentRound = remainingWords.take(numberOfWords).toList();
+  void startGame() {
+    final allWords = getAllWords();
 
-    remainingWords.removeRange(0, numberOfWords);
+    allWords.shuffle(random);
+
+    questions = allWords.take(questionsPerGame).toList();
 
     questionIndex = 0;
+    score = 0;
+    answered = false;
+    correct = false;
+    gameFinished = false;
+
     loadQuestion();
   }
 
   void loadQuestion() {
-    currentQuestion = currentRound[questionIndex];
+    currentQuestion = questions[questionIndex];
 
-    options = List<String>.from(currentQuestion['options']);
+    options = List<String>.from(
+      currentQuestion['options'],
+    );
+
     options.shuffle(random);
 
     answered = false;
     correct = false;
   }
 
+  Future<void> playSound() async {
+    final word = currentQuestion['word'] as String;
+
+    await _ttsService.stop();
+    await _ttsService.speak(word);
+  }
+
   void checkAnswer(String selectedWord) {
-    if (answered) return;
+    if (answered || gameFinished) {
+      return;
+    }
 
     final correctWord = currentQuestion['word'] as String;
 
@@ -250,47 +246,36 @@ class _HearWordGameState extends State<HearWordGame> {
   }
 
   void nextQuestion() {
-    if (questionIndex < currentRound.length - 1) {
+    _ttsService.stop();
+
+    if (questionIndex < questions.length - 1) {
       setState(() {
         questionIndex++;
         loadQuestion();
       });
     } else {
-      if (remainingWords.isNotEmpty) {
-        setState(() {
-          startNextRound();
-        });
-      } else {
-        setState(() {
-          currentRound = [];
-        });
-      }
+      setState(() {
+        gameFinished = true;
+      });
     }
   }
 
-  void changeCategory(String? category) {
-    if (category == null) return;
+  void playAgain() {
+    _ttsService.stop();
 
     setState(() {
-      selectedCategory = category;
-      score = 0;
-
-      remainingWords = getUniqueWords(categories[selectedCategory]!);
-      remainingWords.shuffle(random);
-
-      startNextRound();
+      startGame();
     });
   }
 
-  void playSound() {
-    // Connect teammate TTS here.
+  @override
+  void dispose() {
+    _ttsService.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final bool categoryFinished =
-        remainingWords.isEmpty && currentRound.isEmpty;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Hear & Choose'),
@@ -302,7 +287,7 @@ class _HearWordGameState extends State<HearWordGame> {
             horizontal: 18,
             vertical: 10,
           ),
-          child: categoryFinished
+          child: gameFinished
               ? buildCompletedScreen()
               : buildGameScreen(),
         ),
@@ -314,32 +299,10 @@ class _HearWordGameState extends State<HearWordGame> {
     return SingleChildScrollView(
       child: Column(
         children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: DropdownButton<String>(
-              value: selectedCategory,
-              underline: const SizedBox(),
-              items: categories.keys.map((category) {
-                return DropdownMenuItem<String>(
-                  value: category,
-                  child: Text(
-                    category,
-                    style: TextStyle(
-                      fontFamily: kAppFont,
-                      fontSize: 17,
-                      color: AppColors.ink,
-                    ),
-                  ),
-                );
-              }).toList(),
-              onChanged: changeCategory,
-            ),
-          ),
-
-          const SizedBox(height: 5),
+          const SizedBox(height: 15),
 
           LinearProgressIndicator(
-            value: (questionIndex + 1) / currentRound.length,
+            value: (questionIndex + 1) / questionsPerGame,
             minHeight: 8,
             borderRadius: BorderRadius.circular(10),
           ),
@@ -347,7 +310,7 @@ class _HearWordGameState extends State<HearWordGame> {
           const SizedBox(height: 10),
 
           Text(
-            'Word ${questionIndex + 1} of ${currentRound.length}',
+            'Question ${questionIndex + 1} of $questionsPerGame',
             style: TextStyle(
               fontFamily: kAppFont,
               fontSize: 17,
@@ -356,7 +319,7 @@ class _HearWordGameState extends State<HearWordGame> {
             ),
           ),
 
-          const SizedBox(height: 22),
+          const SizedBox(height: 28),
 
           Text(
             'Listen to the word',
@@ -380,7 +343,7 @@ class _HearWordGameState extends State<HearWordGame> {
             ),
           ),
 
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
 
           Container(
             width: 78,
@@ -398,7 +361,7 @@ class _HearWordGameState extends State<HearWordGame> {
             ),
           ),
 
-          const SizedBox(height: 18),
+          const SizedBox(height: 22),
 
           Text(
             'Drag the correct word here',
@@ -410,7 +373,7 @@ class _HearWordGameState extends State<HearWordGame> {
             ),
           ),
 
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
 
           DragTarget<String>(
             onAcceptWithDetails: (details) {
@@ -447,7 +410,7 @@ class _HearWordGameState extends State<HearWordGame> {
             },
           ),
 
-          const SizedBox(height: 22),
+          const SizedBox(height: 24),
 
           Row(
             children: options.map((word) {
@@ -456,17 +419,14 @@ class _HearWordGameState extends State<HearWordGame> {
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: Draggable<String>(
                     data: word,
-
                     feedback: Material(
                       color: Colors.transparent,
                       child: WordTile(word: word),
                     ),
-
                     childWhenDragging: Opacity(
                       opacity: 0.3,
                       child: WordTile(word: word),
                     ),
-
                     child: WordTile(word: word),
                   ),
                 ),
@@ -477,45 +437,32 @@ class _HearWordGameState extends State<HearWordGame> {
           if (correct)
             Padding(
               padding: const EdgeInsets.only(
-                top: 12,
+                top: 14,
                 bottom: 8,
               ),
               child: SizedBox(
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.zero,
-                    minimumSize: const Size(
-                      double.infinity,
-                      56,
-                    ),
-                    tapTargetSize:
-                        MaterialTapTargetSize.shrinkWrap,
-                  ),
                   onPressed: nextQuestion,
                   child: Text(
-                    questionIndex == currentRound.length - 1
-                        ? (remainingWords.isEmpty
-                            ? 'Finish'
-                            : 'Next Try')
+                    questionIndex == questions.length - 1
+                        ? 'Finish'
                         : 'Next Word',
-                    textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: kAppFont,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      height: 1.2,
                     ),
                   ),
                 ),
               ),
             ),
 
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
 
           Text(
-            'Score: $score',
+            'Score: $score / ${questionsPerGame * 10}',
             style: TextStyle(
               fontFamily: kAppFont,
               fontSize: 18,
@@ -524,7 +471,7 @@ class _HearWordGameState extends State<HearWordGame> {
             ),
           ),
 
-          const SizedBox(height: 15),
+          const SizedBox(height: 20),
         ],
       ),
     );
@@ -533,28 +480,6 @@ class _HearWordGameState extends State<HearWordGame> {
   Widget buildCompletedScreen() {
     return Column(
       children: [
-        Align(
-          alignment: Alignment.centerLeft,
-          child: DropdownButton<String>(
-            value: selectedCategory,
-            underline: const SizedBox(),
-            items: categories.keys.map((category) {
-              return DropdownMenuItem<String>(
-                value: category,
-                child: Text(
-                  category,
-                  style: TextStyle(
-                    fontFamily: kAppFont,
-                    fontSize: 17,
-                    color: AppColors.ink,
-                  ),
-                ),
-              );
-            }).toList(),
-            onChanged: changeCategory,
-          ),
-        ),
-
         const Spacer(),
 
         const Icon(
@@ -577,7 +502,7 @@ class _HearWordGameState extends State<HearWordGame> {
         const SizedBox(height: 12),
 
         Text(
-          'You completed all the words in $selectedCategory.',
+          'You completed all 4 questions!',
           textAlign: TextAlign.center,
           style: TextStyle(
             fontFamily: kAppFont,
@@ -589,7 +514,7 @@ class _HearWordGameState extends State<HearWordGame> {
         const SizedBox(height: 20),
 
         Text(
-          'Final Score: $score',
+          'Final Score: $score / ${questionsPerGame * 10}',
           style: TextStyle(
             fontFamily: kAppFont,
             fontSize: 21,
@@ -600,13 +525,19 @@ class _HearWordGameState extends State<HearWordGame> {
 
         const SizedBox(height: 30),
 
-        Text(
-          'Choose another category to continue.',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontFamily: kAppFont,
-            fontSize: 17,
-            color: AppColors.ink,
+        SizedBox(
+          width: double.infinity,
+          height: 54,
+          child: ElevatedButton(
+            onPressed: playAgain,
+            child: Text(
+              'Play Again',
+              style: TextStyle(
+                fontFamily: kAppFont,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ),
 
