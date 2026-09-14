@@ -119,10 +119,10 @@ class _SimplifyScreenState extends State<SimplifyScreen> {
                   padding: const EdgeInsets.all(20),
 
                   decoration: BoxDecoration(
-                    color: AppColors.displayBox,
-                    borderRadius: BorderRadius.circular(10),
+                    color: AppColors.readingPaper,
+                    borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: AppColors.paperDeep,
+                      color: AppColors.grape.withOpacity(0.25),
                       width: 1.5,
                     ),
                   ),

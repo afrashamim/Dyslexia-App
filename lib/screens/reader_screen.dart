@@ -28,9 +28,15 @@ class _ReaderScreenState extends State<ReaderScreen> {
       children: [
         SizedBox(
           width: 64,
-          child: Text(label,
-              style: const TextStyle(
-                  fontWeight: FontWeight.w600, color: AppColors.ink)),
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontFamily: kAppFont,
+              fontWeight: FontWeight.w700,
+              fontSize: 14,
+              color: AppColors.ink,
+            ),
+          ),
         ),
         Expanded(
           child: Slider(
@@ -55,7 +61,11 @@ class _ReaderScreenState extends State<ReaderScreen> {
             TextField(
               controller: controller,
               maxLines: 6,
-              style: const TextStyle(fontSize: 17, color: AppColors.ink),
+              style: const TextStyle(
+                fontFamily: kAppFont,
+                fontSize: 17,
+                color: AppColors.ink,
+              ),
               decoration: const InputDecoration(
                 hintText: 'Paste or type your text here...',
               ),
@@ -65,17 +75,16 @@ class _ReaderScreenState extends State<ReaderScreen> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () => setState(() => displayedText = controller.text),
-                child: const Text('Show Text'),
+                child: const Text('Show text'),
               ),
             ),
             const SizedBox(height: 16),
 
-            // Reading controls — live "Aa" preview grows with font size
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.paperDeep,
-                borderRadius: BorderRadius.circular(10),
+                color: AppColors.grape.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(20),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -98,7 +107,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
                     style: TextStyle(
                       fontFamily: kAppFont,
                       fontSize: fontSize,
-                      color: AppColors.moss,
+                      color: AppColors.grape,
                       fontWeight: FontWeight.w700,
                     ),
                     child: const Text('Aa'),
@@ -114,9 +123,8 @@ class _ReaderScreenState extends State<ReaderScreen> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: AppColors.displayBox,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: AppColors.paperDeep, width: 1.5),
+                    color: AppColors.readingPaper,
+                    borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
                     displayedText.isEmpty
@@ -124,6 +132,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
                         : displayedText,
                     textAlign: TextAlign.left,
                     style: TextStyle(
+                      fontFamily: kAppFont,
                       fontSize: fontSize,
                       height: lineHeight,
                       letterSpacing: letterSpacing,
