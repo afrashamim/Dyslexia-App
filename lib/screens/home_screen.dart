@@ -5,6 +5,7 @@ import 'reader_screen.dart';
 import 'simplify_screen.dart';
 import '../tts/tts_testscreen.dart';
 import '../phonics/phonics_screen.dart';
+import '../theme/app_theme.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
