@@ -1,5 +1,5 @@
+import 'screens/splash_screen.dart';
 import 'package:flutter/material.dart';
-import 'screens/home_screen.dart';
 import 'theme/app_theme.dart';
 
 void main() {
@@ -15,7 +15,7 @@ class ReadEaseApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'ReadEase',
       theme: appTheme,
-      home: const HomeScreen(),
+      home: const SplashScreen(),
     );
   }
 }

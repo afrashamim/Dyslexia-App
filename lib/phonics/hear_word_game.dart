@@ -435,29 +435,36 @@ class _HearWordGameState extends State<HearWordGame> {
           ),
 
           if (correct)
-            Padding(
-              padding: const EdgeInsets.only(
-                top: 14,
-                bottom: 8,
-              ),
-              child: SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton(
-                  onPressed: nextQuestion,
-                  child: Text(
-                    questionIndex == questions.length - 1
-                        ? 'Finish'
-                        : 'Next Word',
-                    style: TextStyle(
-                      fontFamily: kAppFont,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+              Padding(
+                padding: const EdgeInsets.only(
+                  top: 14,
+                  bottom: 8,
+                ),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 68,
+                  child: ElevatedButton(
+                    onPressed: nextQuestion,
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      minimumSize: const Size(double.infinity, 68),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: Text(
+                      questionIndex == questions.length - 1
+                          ? 'Finish'
+                          : 'Next Word',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: kAppFont,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        height: 1.2,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
 
           const SizedBox(height: 10),
 
@@ -527,15 +534,22 @@ class _HearWordGameState extends State<HearWordGame> {
 
         SizedBox(
           width: double.infinity,
-          height: 54,
+          height: 68,
           child: ElevatedButton(
             onPressed: playAgain,
+            style: ElevatedButton.styleFrom(
+              padding: EdgeInsets.zero,
+              minimumSize: const Size(double.infinity, 68),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
             child: Text(
               'Play Again',
+              textAlign: TextAlign.center,
               style: TextStyle(
                 fontFamily: kAppFont,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
+                height: 1.2,
               ),
             ),
           ),

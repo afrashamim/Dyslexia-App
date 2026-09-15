@@ -1,7 +1,10 @@
 import 'dart:convert';
 import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
+
+import '../theme/app_theme.dart';
 
 class BuildWordGame extends StatefulWidget {
   const BuildWordGame({super.key});
@@ -11,14 +14,11 @@ class BuildWordGame extends StatefulWidget {
 }
 
 class _BuildWordGameState extends State<BuildWordGame> {
-  // How many words to play in one round.
   static const int roundLength = 4;
 
-  // All words loaded from assets/words.json, grouped by category.
   Map<String, List<Map<String, String>>> wordsByCategory = {};
   bool isLoading = true;
 
-  // Which categories are currently included in the pool.
   Set<String> selectedCategories = {};
 
   int wordIndex = 0;
@@ -26,7 +26,10 @@ class _BuildWordGameState extends State<BuildWordGame> {
 
   late List<Map<String, String>> words;
   late List<String> availableLetters;
+
   List<String> selectedLetters = [];
+
+  bool gameFinished = false;
 
   @override
   void initState() {
@@ -42,10 +45,12 @@ class _BuildWordGameState extends State<BuildWordGame> {
 
     decoded.forEach((category, entries) {
       parsed[category] = (entries as List)
-          .map((e) => {
-                'word': (e['word'] as String).toUpperCase(),
-                'hint': e['hint'] as String,
-              })
+          .map(
+            (e) => {
+              'word': (e['word'] as String).toUpperCase(),
+              'hint': e['hint'] as String,
+            },
+          )
           .toList();
     });
 
@@ -79,6 +84,7 @@ class _BuildWordGameState extends State<BuildWordGame> {
 
     wordIndex = 0;
     score = 0;
+    gameFinished = false;
 
     prepareLetters();
   }
@@ -129,7 +135,9 @@ class _BuildWordGameState extends State<BuildWordGame> {
             prepareLetters();
           });
         } else {
-          showFinalScore();
+          setState(() {
+            gameFinished = true;
+          });
         }
       });
     } else {
@@ -142,45 +150,10 @@ class _BuildWordGameState extends State<BuildWordGame> {
     }
   }
 
-  void showFinalScore() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Game Complete! 🎉'),
-          content: Text(
-            'Your score is $score / ${words.length * 10}',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-
-                setState(() {
-                  startNewRound();
-                });
-              },
-              child: const Text('Play Again'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                openCategoryPicker();
-              },
-              child: const Text('Change Categories'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.pop(context);
-              },
-              child: const Text('Exit'),
-            ),
-          ],
-        );
-      },
-    );
+  void playAgain() {
+    setState(() {
+      startNewRound();
+    });
   }
 
   void openCategoryPicker() {
@@ -192,14 +165,25 @@ class _BuildWordGameState extends State<BuildWordGame> {
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return AlertDialog(
-              title: const Text('Choose Categories'),
+              title: const Text(
+                'Choose Categories',
+                style: TextStyle(
+                  fontFamily: kAppFont,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               content: SizedBox(
                 width: double.maxFinite,
                 child: ListView(
                   shrinkWrap: true,
                   children: wordsByCategory.keys.map((category) {
                     return CheckboxListTile(
-                      title: Text(category),
+                      title: Text(
+                        category,
+                        style: const TextStyle(
+                          fontFamily: kAppFont,
+                        ),
+                      ),
                       value: tempSelection.contains(category),
                       onChanged: (checked) {
                         setDialogState(() {
@@ -217,7 +201,12 @@ class _BuildWordGameState extends State<BuildWordGame> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancel'),
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(
+                      fontFamily: kAppFont,
+                    ),
+                  ),
                 ),
                 TextButton(
                   onPressed: tempSelection.isEmpty
@@ -230,7 +219,12 @@ class _BuildWordGameState extends State<BuildWordGame> {
                           Navigator.pop(context);
                           startNewRound();
                         },
-                  child: const Text('Start'),
+                  child: const Text(
+                    'Start',
+                    style: TextStyle(
+                      fontFamily: kAppFont,
+                    ),
+                  ),
                 ),
               ],
             );
@@ -240,18 +234,21 @@ class _BuildWordGameState extends State<BuildWordGame> {
     );
   }
 
-  // Calculates a tile size that keeps all selected letters on a single line,
-  // shrinking as words get longer so the "Your word" box never overflows.
   double _tileSizeFor(double availableWidth, int letterCount) {
     const maxTileSize = 65.0;
     const minTileSize = 34.0;
     const margin = 12.0;
 
-    if (letterCount == 0) return maxTileSize;
+    if (letterCount == 0) {
+      return maxTileSize;
+    }
 
     final sizeThatFits = (availableWidth / letterCount) - margin;
 
-    return sizeThatFits.clamp(minTileSize, maxTileSize);
+    return sizeThatFits.clamp(
+      minTileSize,
+      maxTileSize,
+    );
   }
 
   @override
@@ -263,8 +260,6 @@ class _BuildWordGameState extends State<BuildWordGame> {
         ),
       );
     }
-
-    final currentWord = words[wordIndex];
 
     return Scaffold(
       appBar: AppBar(
@@ -278,151 +273,299 @@ class _BuildWordGameState extends State<BuildWordGame> {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            LinearProgressIndicator(
-              value: (wordIndex + 1) / words.length,
-              minHeight: 10,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 18,
+            vertical: 10,
+          ),
+          child: gameFinished
+              ? buildCompletedScreen()
+              : buildGameScreen(),
+        ),
+      ),
+    );
+  }
+
+  Widget buildGameScreen() {
+    final currentWord = words[wordIndex];
+
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          const SizedBox(height: 15),
+
+          LinearProgressIndicator(
+            value: (wordIndex + 1) / words.length,
+            minHeight: 8,
+            borderRadius: BorderRadius.circular(10),
+          ),
+
+          const SizedBox(height: 10),
+
+          Text(
+            'Word ${wordIndex + 1} of ${words.length}',
+            style: TextStyle(
+              fontFamily: kAppFont,
+              fontSize: 17,
+              fontWeight: FontWeight.bold,
+              color: AppColors.ink,
             ),
+          ),
 
-            const SizedBox(height: 15),
+          const SizedBox(height: 28),
 
-            Text(
-              'Word ${wordIndex + 1} of ${words.length}',
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+          Text(
+            'Build the word',
+            style: TextStyle(
+              fontFamily: kAppFont,
+              fontSize: 23,
+              fontWeight: FontWeight.bold,
+              color: AppColors.ink,
             ),
+          ),
 
-            const SizedBox(height: 35),
+          const SizedBox(height: 12),
 
-            const Text(
-              'Build the word',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+          Text(
+            currentWord['hint'] as String,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: kAppFont,
+              fontSize: 16,
+              color: AppColors.ink,
             ),
+          ),
 
-            const SizedBox(height: 15),
+          const SizedBox(height: 28),
 
-            Text(
-              currentWord['hint'] as String,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 18,
-              ),
+          Text(
+            'Your word',
+            style: TextStyle(
+              fontFamily: kAppFont,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppColors.ink,
             ),
+          ),
 
-            const SizedBox(height: 35),
+          const SizedBox(height: 12),
 
-            const Text(
-              'Your word',
-              style: TextStyle(
-                fontSize: 18,
-              ),
+          Container(
+            width: double.infinity,
+            height: 90,
+            padding: const EdgeInsets.symmetric(
+              horizontal: 10,
             ),
-
-            const SizedBox(height: 15),
-
-            Container(
-              width: double.infinity,
-              height: 90,
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              decoration: BoxDecoration(
-                border: Border.all(width: 2),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Center(
-                child: selectedLetters.isEmpty
-                    ? const Text(
-                        'Tap the letters below',
-                        style: TextStyle(
-                          fontSize: 16,
-                        ),
-                      )
-                    : LayoutBuilder(
-                        builder: (context, constraints) {
-                          final tileSize = _tileSizeFor(
-                            constraints.maxWidth,
-                            selectedLetters.length,
-                          );
-
-                          return Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children:
-                                selectedLetters.asMap().entries.map((entry) {
-                              final index = entry.key;
-                              final letter = entry.value;
-
-                              return GestureDetector(
-                                onTap: () => removeLetter(index),
-                                child: LetterTile(
-                                  letter: letter,
-                                  size: tileSize,
-                                ),
-                              );
-                            }).toList(),
-                          );
-                        },
+            decoration: BoxDecoration(
+              color: AppColors.readingPaper,
+              border: Border.all(width: 2),
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Center(
+              child: selectedLetters.isEmpty
+                  ? Text(
+                      'Tap the letters below',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: kAppFont,
+                        fontSize: 16,
+                        color: AppColors.inkFaded,
                       ),
+                    )
+                  : LayoutBuilder(
+                      builder: (context, constraints) {
+                        final tileSize = _tileSizeFor(
+                          constraints.maxWidth,
+                          selectedLetters.length,
+                        );
+
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children:
+                              selectedLetters.asMap().entries.map((entry) {
+                            final index = entry.key;
+                            final letter = entry.value;
+
+                            return GestureDetector(
+                              onTap: () => removeLetter(index),
+                              child: LetterTile(
+                                letter: letter,
+                                size: tileSize,
+                              ),
+                            );
+                          }).toList(),
+                        );
+                      },
+                    ),
+            ),
+          ),
+
+          const SizedBox(height: 32),
+
+          Text(
+            'Choose the letters',
+            style: TextStyle(
+              fontFamily: kAppFont,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppColors.ink,
+            ),
+          ),
+
+          const SizedBox(height: 18),
+
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 4,
+            runSpacing: 10,
+            children: availableLetters.map((letter) {
+              return GestureDetector(
+                onTap: () => selectLetter(letter),
+                child: LetterTile(
+                  letter: letter,
+                ),
+              );
+            }).toList(),
+          ),
+
+          const SizedBox(height: 32),
+
+          SizedBox(
+            width: double.infinity,
+            height: 68,
+            child: ElevatedButton(
+              onPressed:
+                  selectedLetters.isEmpty ? null : checkWord,
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.zero,
+                minimumSize: const Size(
+                  double.infinity,
+                  68,
+                ),
+                tapTargetSize:
+                    MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: Text(
+                'Check Answer',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: kAppFont,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  height: 1.2,
+                ),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 18),
+
+          Text(
+            'Score: $score',
+            style: TextStyle(
+              fontFamily: kAppFont,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppColors.ink,
+            ),
+          ),
+
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+
+  // ----------------------------------------------------------
+  // COMPLETED SCREEN
+  // Same style as Hear & Choose
+  // ----------------------------------------------------------
+
+  Widget buildCompletedScreen() {
+    return SingleChildScrollView(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          minHeight: MediaQuery.of(context).size.height - 140,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const SizedBox(height: 50),
+
+            const Icon(
+              Icons.celebration_outlined,
+              size: 70,
+            ),
+
+            const SizedBox(height: 20),
+
+            Text(
+              'Great job! 🎉',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: kAppFont,
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: AppColors.ink,
               ),
             ),
 
-            const SizedBox(height: 40),
+            const SizedBox(height: 12),
 
-            const Text(
-              'Choose the letters',
+            Text(
+              'You completed all ${words.length} questions!',
+              textAlign: TextAlign.center,
               style: TextStyle(
+                fontFamily: kAppFont,
                 fontSize: 18,
+                color: AppColors.ink,
               ),
             ),
 
             const SizedBox(height: 20),
 
-            Wrap(
-              alignment: WrapAlignment.center,
-              children: availableLetters.map((letter) {
-                return GestureDetector(
-                  onTap: () => selectLetter(letter),
-                  child: LetterTile(letter: letter),
-                );
-              }).toList(),
+            Text(
+              'Final Score: $score / ${words.length * 10}',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: kAppFont,
+                fontSize: 21,
+                fontWeight: FontWeight.bold,
+                color: AppColors.ink,
+              ),
             ),
 
-            const SizedBox(height: 40),
+            const SizedBox(height: 30),
 
-            // FIXED CHECK ANSWER BUTTON
             SizedBox(
               width: double.infinity,
-              height: 60,
+              height: 68,
               child: ElevatedButton(
-                onPressed:
-                    selectedLetters.isEmpty ? null : checkWord,
+                onPressed: playAgain,
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.zero,
+                  minimumSize: const Size(
+                    double.infinity,
+                    68,
+                  ),
+                  tapTargetSize:
+                      MaterialTapTargetSize.shrinkWrap,
                 ),
-                child: const Text(
-                  'Check Answer',
+                child: Text(
+                  'Play Again',
+                  textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 20,
+                    fontFamily: kAppFont,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    height: 1.2,
                   ),
                 ),
               ),
             ),
 
-            const Spacer(),
-
-            Text(
-              'Score: $score',
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            const SizedBox(height: 50),
           ],
         ),
       ),
@@ -445,17 +588,23 @@ class LetterTile extends StatelessWidget {
     return Container(
       width: size,
       height: size,
-      margin: const EdgeInsets.symmetric(horizontal: 6),
+      margin: const EdgeInsets.symmetric(
+        horizontal: 6,
+      ),
       alignment: Alignment.center,
       decoration: BoxDecoration(
+        color: AppColors.readingPaper,
         borderRadius: BorderRadius.circular(15),
         border: Border.all(width: 2),
       ),
       child: Text(
         letter,
+        textAlign: TextAlign.center,
         style: TextStyle(
+          fontFamily: kAppFont,
           fontSize: size * 0.46,
           fontWeight: FontWeight.bold,
+          color: AppColors.ink,
         ),
       ),
     );
