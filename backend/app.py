@@ -11,9 +11,8 @@ CORS(app)
 
 # Read the Groq API key from .env
 api_key = os.getenv("GROQ_API_KEY")
-
 if not api_key:
-    raise ValueError("GROQ_API_KEY is not set in the .env file")
+    raise ValueError("GROQ_API_KEY is not set")
 
 client = Groq(api_key=api_key)
 
@@ -63,4 +62,4 @@ def simplify():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
