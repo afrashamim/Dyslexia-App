@@ -28,7 +28,7 @@ class _SimplifyScreenState extends State<SimplifyScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://10.0.2.2:5000/simplify'),
+        Uri.parse('https://learnable-backend-0arz.onrender.com/simplify'),
         headers: {
           'Content-Type': 'application/json',
         },
