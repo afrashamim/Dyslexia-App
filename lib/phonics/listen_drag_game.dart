@@ -24,325 +24,325 @@ class _ListenDragGameState extends State<ListenDragGame> {
   // PHONICS QUESTION BANK
   // =====================================================
 
-  final List<Map<String, dynamic>> allQuestions = [
-    // -------------------------
-    // BASIC CONSONANTS
-    // -------------------------
+    final List<Map<String, dynamic>> allQuestions = [
+        // -------------------------
+        // BASIC CONSONANTS
+        // -------------------------
 
-    {
-      'sound': '/b/',
-      'speak': 'buh',
-      'answer': 'B',
-      'options': ['B', 'D', 'P'],
-    },
-    {
-      'sound': '/d/',
-      'speak': 'duh',
-      'answer': 'D',
-      'options': ['B', 'D', 'P'],
-    },
-    {
-      'sound': '/p/',
-      'speak': 'puh',
-      'answer': 'P',
-      'options': ['B', 'P', 'D'],
-    },
-    {
-      'sound': '/m/',
-      'speak': 'mmm',
-      'answer': 'M',
-      'options': ['N', 'M', 'W'],
-    },
-    {
-      'sound': '/n/',
-      'speak': 'nnn',
-      'answer': 'N',
-      'options': ['M', 'N', 'H'],
-    },
-    {
-      'sound': '/t/',
-      'speak': 'tuh',
-      'answer': 'T',
-      'options': ['T', 'D', 'P'],
-    },
-    {
-      'sound': '/k/',
-      'speak': 'kuh',
-      'answer': 'C',
-      'options': ['G', 'C', 'K'],
-    },
-    {
-      'sound': '/g/',
-      'speak': 'guh',
-      'answer': 'G',
-      'options': ['G', 'C', 'D'],
-    },
-    {
-      'sound': '/f/',
-      'speak': 'fff',
-      'answer': 'F',
-      'options': ['F', 'V', 'S'],
-    },
-    {
-      'sound': '/v/',
-      'speak': 'vvv',
-      'answer': 'V',
-      'options': ['F', 'V', 'W'],
-    },
-    {
-      'sound': '/s/',
-      'speak': 'sss',
-      'answer': 'S',
-      'options': ['F', 'S', 'T'],
-    },
-    {
-      'sound': '/z/',
-      'speak': 'zzz',
-      'answer': 'Z',
-      'options': ['S', 'Z', 'X'],
-    },
-    {
-      'sound': '/h/',
-      'speak': 'huh',
-      'answer': 'H',
-      'options': ['H', 'N', 'W'],
-    },
-    {
-      'sound': '/j/',
-      'speak': 'juh',
-      'answer': 'J',
-      'options': ['G', 'J', 'D'],
-    },
-    {
-      'sound': '/l/',
-      'speak': 'lll',
-      'answer': 'L',
-      'options': ['L', 'R', 'I'],
-    },
-    {
-      'sound': '/r/',
-      'speak': 'rrr',
-      'answer': 'R',
-      'options': ['R', 'L', 'W'],
-    },
-    {
-      'sound': '/w/',
-      'speak': 'wuh',
-      'answer': 'W',
-      'options': ['W', 'V', 'M'],
-    },
-    {
-      'sound': '/y/',
-      'speak': 'yuh',
-      'answer': 'Y',
-      'options': ['Y', 'J', 'I'],
-    },
-    {
-      'sound': '/x/',
-      'speak': 'ks',
-      'answer': 'X',
-      'options': ['X', 'Z', 'S'],
-    },
+        {
+          'sound': '/b/',
+          'speak': 'buh',
+          'answer': 'B',
+          'options': ['B', 'D', 'P'],
+        },
+        {
+          'sound': '/d/',
+          'speak': 'duh',
+          'answer': 'D',
+          'options': ['B', 'D', 'P'],
+        },
+        {
+          'sound': '/p/',
+          'speak': 'puh',
+          'answer': 'P',
+          'options': ['B', 'P', 'D'],
+        },
+        {
+          'sound': '/m/',
+          'speak': 'muh', // was 'm' -> TTS said the letter name "em"
+          'answer': 'M',
+          'options': ['N', 'M', 'W'],
+        },
+        {
+          'sound': '/n/',
+          'speak': 'nuh', // was 'n' -> TTS said the letter name "en"
+          'answer': 'N',
+          'options': ['M', 'N', 'H'],
+        },
+        {
+          'sound': '/t/',
+          'speak': 'tuh',
+          'answer': 'T',
+          'options': ['T', 'D', 'P'],
+        },
+        {
+          'sound': '/k/',
+          'speak': 'kuh',
+          'answer': 'C',
+          'options': ['G', 'C', 'T'], // was ['G','C','K'] -> K makes the identical /k/ sound as C
+        },
+        {
+          'sound': '/g/',
+          'speak': 'guh',
+          'answer': 'G',
+          'options': ['G', 'C', 'D'],
+        },
+        {
+          'sound': '/f/',
+          'speak': 'fah', // was 'f' -> TTS said the letter name "eff"
+          'answer': 'F',
+          'options': ['F', 'V', 'S'],
+        },
+        {
+          'sound': '/v/',
+          'speak': 'vuh', // was 'vvv' -> inconsistent across engines
+          'answer': 'V',
+          'options': ['F', 'V', 'W'],
+        },
+        {
+          'sound': '/s/',
+          'speak': 'suh', // was 'sss' -> inconsistent across engines
+          'answer': 'S',
+          'options': ['F', 'S', 'T'],
+        },
+        {
+          'sound': '/z/',
+          'speak': 'zuh', // was 'zzz' -> inconsistent across engines
+          'answer': 'Z',
+          'options': ['S', 'Z', 'X'],
+        },
+        {
+          'sound': '/h/',
+          'speak': 'huh',
+          'answer': 'H',
+          'options': ['H', 'N', 'W'],
+        },
+        {
+          'sound': '/j/',
+          'speak': 'juh',
+          'answer': 'J',
+          'options': ['W', 'J', 'D'], // was ['G','J','D'] -> soft G makes the identical /j/ sound
+        },
+        {
+          'sound': '/l/',
+          'speak': 'luh', // was 'lll' -> inconsistent across engines
+          'answer': 'L',
+          'options': ['L', 'R', 'I'],
+        },
+        {
+          'sound': '/r/',
+          'speak': 'ruh', // was 'rrr' -> inconsistent across engines
+          'answer': 'R',
+          'options': ['R', 'L', 'W'],
+        },
+        {
+          'sound': '/w/',
+          'speak': 'wuh',
+          'answer': 'W',
+          'options': ['W', 'V', 'M'],
+        },
+        {
+          'sound': '/y/',
+          'speak': 'yuh',
+          'answer': 'Y',
+          'options': ['Y', 'J', 'I'],
+        },
+        {
+          'sound': '/x/',
+          'speak': 'eks', // was 'ks' -> TTS spelled it out as "K" "S"
+          'answer': 'X',
+          'options': ['X', 'Z', 'S'],
+        },
 
-    // -------------------------
-    // SHORT VOWELS
-    // -------------------------
+        // -------------------------
+        // SHORT VOWELS
+        // -------------------------
 
-    {
-      'sound': '/a/',
-      'speak': 'a as in apple',
-      'answer': 'A',
-      'options': ['A', 'E', 'O'],
-    },
-    {
-      'sound': '/e/',
-      'speak': 'e as in egg',
-      'answer': 'E',
-      'options': ['I', 'E', 'A'],
-    },
-    {
-      'sound': '/i/',
-      'speak': 'i as in igloo',
-      'answer': 'I',
-      'options': ['I', 'E', 'U'],
-    },
-    {
-      'sound': '/o/',
-      'speak': 'o as in octopus',
-      'answer': 'O',
-      'options': ['A', 'O', 'U'],
-    },
-    {
-      'sound': '/u/',
-      'speak': 'u as in umbrella',
-      'answer': 'U',
-      'options': ['U', 'O', 'A'],
-    },
+        {
+          'sound': '/a/',
+          'speak': 'aa',
+          'answer': 'A',
+          'options': ['A', 'E', 'O'],
+        },
+        {
+          'sound': '/e/',
+          'speak': 'e',
+          'answer': 'E',
+          'options': ['I', 'E', 'A'],
+        },
+        {
+          'sound': '/i/',
+          'speak': 'i',
+          'answer': 'I',
+          'options': ['I', 'E', 'U'],
+        },
+        {
+          'sound': '/o/',
+          'speak': 'o',
+          'answer': 'O',
+          'options': ['A', 'O', 'U'],
+        },
+        {
+          'sound': '/u/',
+          'speak': 'u',
+          'answer': 'U',
+          'options': ['U', 'O', 'A'],
+        },
 
-    // -------------------------
-    // DIGRAPHS
-    // -------------------------
+        // -------------------------
+        // DIGRAPHS
+        // -------------------------
 
-    {
-      'sound': '/sh/',
-      'speak': 'sh',
-      'answer': 'SH',
-      'options': ['SH', 'CH', 'TH'],
-    },
-    {
-      'sound': '/ch/',
-      'speak': 'ch',
-      'answer': 'CH',
-      'options': ['CH', 'SH', 'TH'],
-    },
-    {
-      'sound': '/th/',
-      'speak': 'th',
-      'answer': 'TH',
-      'options': ['TH', 'SH', 'CH'],
-    },
-    {
-      'sound': '/wh/',
-      'speak': 'wh',
-      'answer': 'WH',
-      'options': ['W', 'WH', 'CH'],
-    },
-    {
-      'sound': '/ph/',
-      'speak': 'f',
-      'answer': 'PH',
-      'options': ['F', 'PH', 'P'],
-    },
-    {
-      'sound': '/ng/',
-      'speak': 'ng',
-      'answer': 'NG',
-      'options': ['N', 'NG', 'NK'],
-    },
-    {
-      'sound': '/ck/',
-      'speak': 'ck',
-      'answer': 'CK',
-      'options': ['K', 'CK', 'CH'],
-    },
+        {
+          'sound': '/sh/',
+          'speak': 'shh', // was 'sh' -> more reliably read as the hushing sound
+          'answer': 'SH',
+          'options': ['SH', 'CH', 'TH'],
+        },
+        {
+          'sound': '/ch/',
+          'speak': 'chuh', // was 'ch'
+          'answer': 'CH',
+          'options': ['CH', 'SH', 'TH'],
+        },
+        {
+          'sound': '/th/',
+          'speak': 'thuh', // was 'th'
+          'answer': 'TH',
+          'options': ['TH', 'SH', 'CH'],
+        },
+        {
+          'sound': '/wh/',
+          'speak': 'wuh', // was 'wh' -> /wh/ is pronounced like /w/
+          'answer': 'WH',
+          'options': ['SH', 'WH', 'CH'], // was ['W','WH','CH'] -> /wh/ sounds identical to /w/
+        },
+        {
+          'sound': '/ph/',
+          'speak': 'fuh', // was 'f' -> kept as the /f/ sound, consistent style
+          'answer': 'PH',
+          'options': ['V', 'PH', 'P'], // was ['F','PH','P'] -> F makes the identical /f/ sound as PH
+        },
+        {
+          'sound': '/ng/',
+          'speak': 'ing', // was 'ng' -> risk of being spelled out; "ing" carries the sound
+          'answer': 'NG',
+          'options': ['N', 'NG', 'NK'],
+        },
+        {
+          'sound': '/ck/',
+          'speak': 'kuh', // was 'ck' -> /ck/ makes the /k/ sound
+          'answer': 'CK',
+          'options': ['T', 'CK', 'CH'], // was ['K','CK','CH'] -> K makes the identical /k/ sound as CK
+        },
 
-    // -------------------------
-    // LONG VOWELS
-    // -------------------------
+        // -------------------------
+        // LONG VOWELS
+        // -------------------------
 
-    {
-      'sound': '/ay/',
-      'speak': 'ay',
-      'answer': 'AY',
-      'options': ['AI', 'AY', 'EA'],
-    },
-    {
-      'sound': '/ee/',
-      'speak': 'ee',
-      'answer': 'EE',
-      'options': ['EE', 'EA', 'IE'],
-    },
-    {
-      'sound': '/oa/',
-      'speak': 'oa',
-      'answer': 'OA',
-      'options': ['OA', 'OW', 'OO'],
-    },
-    {
-      'sound': '/ai/',
-      'speak': 'ay',
-      'answer': 'AI',
-      'options': ['AI', 'AY', 'EI'],
-    },
-    {
-      'sound': '/ie/',
-      'speak': 'eye',
-      'answer': 'IE',
-      'options': ['IE', 'EI', 'EE'],
-    },
+        {
+          'sound': '/ay/',
+          'speak': 'ay',
+          'answer': 'AY',
+          'options': ['OO', 'AY', 'EA'], // was ['AI','AY','EA'] -> AI makes the identical /ay/ sound
+        },
+        {
+          'sound': '/ee/',
+          'speak': 'ee',
+          'answer': 'EE',
+          'options': ['EE', 'OO', 'IE'], // was ['EE','EA','IE'] -> EA can make this identical /ee/ sound
+        },
+        {
+          'sound': '/oa/',
+          'speak': 'oh', // was 'oa' -> not a standard spelling on its own; "oh" is unambiguous
+          'answer': 'OA',
+          'options': ['OA', 'EE', 'OO'], // was ['OA','OW','OO'] -> OW can also make this long-O sound (e.g. "snow")
+        },
+        {
+          'sound': '/ai/',
+          'speak': 'ay',
+          'answer': 'AI',
+          'options': ['OA', 'AI', 'EA'], // was ['AI','AY','EI'] -> AY (and often EI) make the identical /ay/ sound
+        },
+        {
+          'sound': '/ie/',
+          'speak': 'eye',
+          'answer': 'IE',
+          'options': ['IE', 'EI', 'EE'],
+        },
 
-    // -------------------------
-    // VOWEL TEAMS
-    // -------------------------
+        // -------------------------
+        // VOWEL TEAMS
+        // -------------------------
 
-    {
-      'sound': '/oo/',
-      'speak': 'oo',
-      'answer': 'OO',
-      'options': ['OO', 'OA', 'OU'],
-    },
-    {
-      'sound': '/oi/',
-      'speak': 'oy',
-      'answer': 'OI',
-      'options': ['OI', 'OY', 'OU'],
-    },
-    {
-      'sound': '/oy/',
-      'speak': 'oy',
-      'answer': 'OY',
-      'options': ['OI', 'OY', 'OA'],
-    },
-    {
-      'sound': '/ou/',
-      'speak': 'ow',
-      'answer': 'OU',
-      'options': ['OW', 'OU', 'OI'],
-    },
-    {
-      'sound': '/ow/',
-      'speak': 'ow',
-      'answer': 'OW',
-      'options': ['OW', 'OU', 'OA'],
-    },
-    {
-      'sound': '/ea/',
-      'speak': 'ee',
-      'answer': 'EA',
-      'options': ['EE', 'EA', 'IE'],
-    },
-    {
-      'sound': '/ew/',
-      'speak': 'oo',
-      'answer': 'EW',
-      'options': ['EW', 'EU', 'OO'],
-    },
+        {
+          'sound': '/oo/',
+          'speak': 'oo',
+          'answer': 'OO',
+          'options': ['OO', 'OA', 'OU'],
+        },
+        {
+          'sound': '/oi/',
+          'speak': 'oy',
+          'answer': 'OI',
+          'options': ['OI', 'OO', 'OU'], // was ['OI','OY','OU'] -> OY makes the identical /oy/ sound
+        },
+        {
+          'sound': '/oy/',
+          'speak': 'oy',
+          'answer': 'OY',
+          'options': ['OO', 'OY', 'OA'], // was ['OI','OY','OA'] -> OI makes the identical /oy/ sound
+        },
+        {
+          'sound': '/ou/',
+          'speak': 'ow',
+          'answer': 'OU',
+          'options': ['OO', 'OU', 'OI'], // was ['OW','OU','OI'] -> OW makes the identical /ow/ sound
+        },
+        {
+          'sound': '/ow/',
+          'speak': 'ow',
+          'answer': 'OW',
+          'options': ['OW', 'EE', 'OA'], // was ['OW','OU','OA'] -> OU makes the identical /ow/ sound
+        },
+        {
+          'sound': '/ea/',
+          'speak': 'e',
+          'answer': 'EA',
+          'options': ['OO', 'EA', 'IE'], // was ['EE','EA','IE'] -> EE makes the identical /ee/ sound
+        },
+        {
+          'sound': '/ew/',
+          'speak': 'oo',
+          'answer': 'EW',
+          'options': ['EW', 'EU', 'OW'], // was ['EW','EU','OO'] -> OO makes the identical /oo/ sound
+        },
 
-    // -------------------------
-    // R-CONTROLLED VOWELS
-    // -------------------------
+        // -------------------------
+        // R-CONTROLLED VOWELS
+        // -------------------------
 
-    {
-      'sound': '/ar/',
-      'speak': 'ar',
-      'answer': 'AR',
-      'options': ['AR', 'ER', 'OR'],
-    },
-    {
-      'sound': '/er/',
-      'speak': 'er',
-      'answer': 'ER',
-      'options': ['ER', 'AR', 'IR'],
-    },
-    {
-      'sound': '/ir/',
-      'speak': 'er',
-      'answer': 'IR',
-      'options': ['IR', 'ER', 'OR'],
-    },
-    {
-      'sound': '/or/',
-      'speak': 'or',
-      'answer': 'OR',
-      'options': ['OR', 'AR', 'ER'],
-    },
-    {
-      'sound': '/ur/',
-      'speak': 'er',
-      'answer': 'UR',
-      'options': ['UR', 'IR', 'ER'],
-    },
-  ];
+        {
+          'sound': '/ar/',
+          'speak': 'ar',
+          'answer': 'AR',
+          'options': ['AR', 'ER', 'OR'],
+        },
+        {
+          'sound': '/er/',
+          'speak': 'er',
+          'answer': 'ER',
+          'options': ['ER', 'AR', 'OR'], // was ['ER','AR','IR'] -> IR makes the identical /er/ sound
+        },
+        {
+          'sound': '/ir/',
+          'speak': 'er',
+          'answer': 'IR',
+          'options': ['IR', 'AR', 'OR'], // was ['IR','ER','OR'] -> ER makes the identical /er/ sound
+        },
+        {
+          'sound': '/or/',
+          'speak': 'or',
+          'answer': 'OR',
+          'options': ['OR', 'AR', 'ER'],
+        },
+        {
+          'sound': '/ur/',
+          'speak': 'er',
+          'answer': 'UR',
+          'options': ['UR', 'AR', 'OR'], // was ['UR','IR','ER'] -> both IR and ER make the identical /er/ sound
+        },
+      ];
 
   // =====================================================
   // INITIALIZATION
